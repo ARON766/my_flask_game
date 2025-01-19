@@ -1,6 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const restartButton = document.getElementById('restartButton'); // Получаем кнопку
+const restartButton = document.getElementById('restartButton');
 
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -18,8 +18,8 @@ function initGame() {
         width: 50,
         height: 40,
         color: 'blue',
-        speed: 20,
-        lives: 10 // Начальное количество жизней
+        speed: 5,
+        lives: 3 // Начальное количество жизней
     };
 
     bullets = [];
@@ -29,10 +29,21 @@ function initGame() {
 
     // Создание врагов
     for (let i = 0; i < 8; i++) {
-        enemies.push({ x: Math.random() * (WIDTH - 40), y: Math.random() * -200 });
+        spawnEnemy();
     }
 
     restartButton.style.display = 'none'; // Скрываем кнопку при старте игры
+}
+
+function spawnEnemy() {
+    const type = Math.random() < 0.1 ? 'life' : 'normal'; // 10% шанс появления врага с жизнью
+    const enemy = {
+        x: Math.random() * (WIDTH - 40),
+        y: Math.random() * -200,
+        type: type, // Тип врага: 'normal' или 'life'
+        color: type === 'life' ? 'yellow' : 'red' // Цвет врага
+    };
+    enemies.push(enemy);
 }
 
 function drawPlayer() {
@@ -48,8 +59,8 @@ function drawBullets() {
 }
 
 function drawEnemies() {
-    ctx.fillStyle = 'red';
     enemies.forEach(enemy => {
+        ctx.fillStyle = enemy.color;
         ctx.fillRect(enemy.x, enemy.y, 40, 30);
     });
 }
@@ -101,7 +112,7 @@ function update() {
                 bullets.splice(bulletIndex, 1);
                 enemies.splice(enemyIndex, 1);
                 score += 10;
-                enemies.push({ x: Math.random() * (WIDTH - 40), y: -30 });
+                spawnEnemy(); // Создаем нового врага вместо удаленного
             }
         });
     });
@@ -112,7 +123,11 @@ function update() {
             player.x + player.width > enemy.x &&
             player.y < enemy.y + 30 &&
             player.y + player.height > enemy.y) {
-            player.lives -= 1;
+            if (enemy.type === 'life') {
+                player.lives += 1; // Добавляем жизнь
+            } else {
+                player.lives -= 1; // Отнимаем жизнь
+            }
             if (player.lives <= 0) {
                 gameOver = true;
             }
