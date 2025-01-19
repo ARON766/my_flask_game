@@ -17,9 +17,9 @@ function initGame() {
         y: HEIGHT - 50,
         width: 50,
         height: 40,
-        color: 'blue',
-        speed: 5,
-        lives: 3 // Начальное количество жизней
+        color: 'green',
+        speed: 50,
+        lives: 10 // Начальное количество жизней
     };
 
     bullets = [];
