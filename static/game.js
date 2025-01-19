@@ -18,8 +18,8 @@ function initGame() {
         width: 50,
         height: 40,
         color: 'blue',
-        speed: 5,
-        lives: 3 // Начальное количество жизней
+        speed: 20,
+        lives: 10 // Начальное количество жизней
     };
 
     bullets = [];
