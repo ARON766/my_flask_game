@@ -1,23 +1,39 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const restartButton = document.getElementById('restartButton'); // Получаем кнопку
 
 const WIDTH = 800;
 const HEIGHT = 600;
 
-const player = {
-    x: WIDTH / 2 - 25,
-    y: HEIGHT - 50,
-    width: 50,
-    height: 40,
-    color: 'blue',
-    speed: 5,
-    lives: 10 // Добавляем жизни игрока
-};
+let player;
+let bullets;
+let enemies;
+let score;
+let gameOver;
 
-const bullets = [];
-const enemies = [];
-let score = 0;
-let gameOver = false; // Флаг для завершения игры
+function initGame() {
+    player = {
+        x: WIDTH / 2 - 25,
+        y: HEIGHT - 50,
+        width: 50,
+        height: 40,
+        color: 'blue',
+        speed: 5,
+        lives: 3 // Начальное количество жизней
+    };
+
+    bullets = [];
+    enemies = [];
+    score = 0;
+    gameOver = false;
+
+    // Создание врагов
+    for (let i = 0; i < 8; i++) {
+        enemies.push({ x: Math.random() * (WIDTH - 40), y: Math.random() * -200 });
+    }
+
+    restartButton.style.display = 'none'; // Скрываем кнопку при старте игры
+}
 
 function drawPlayer() {
     ctx.fillStyle = player.color;
@@ -55,10 +71,11 @@ function drawGameOver() {
     ctx.font = '48px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('Game Over!', WIDTH / 2, HEIGHT / 2);
+    restartButton.style.display = 'block'; // Показываем кнопку
 }
 
 function update() {
-    if (gameOver) return; // Останавливаем обновление, если игра завершена
+    if (gameOver) return;
 
     // Обновление позиции пуль
     bullets.forEach(bullet => {
@@ -95,11 +112,10 @@ function update() {
             player.x + player.width > enemy.x &&
             player.y < enemy.y + 30 &&
             player.y + player.height > enemy.y) {
-            player.lives -= 1; // Уменьшаем жизни
+            player.lives -= 1;
             if (player.lives <= 0) {
-                gameOver = true; // Завершаем игру, если жизни закончились
+                gameOver = true;
             }
-            // Перемещаем врага за пределы экрана после столкновения
             enemy.y = -30;
             enemy.x = Math.random() * (WIDTH - 40);
         }
@@ -127,8 +143,9 @@ function gameLoop() {
     }
 }
 
+// Обработчик событий для управления игроком
 document.addEventListener('keydown', (e) => {
-    if (gameOver) return; // Игнорируем ввод, если игра завершена
+    if (gameOver) return;
 
     if (e.key === 'ArrowLeft' && player.x > 0) {
         player.x -= player.speed;
@@ -147,9 +164,12 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Создание врагов
-for (let i = 0; i < 8; i++) {
-    enemies.push({ x: Math.random() * (WIDTH - 40), y: Math.random() * -200 });
-}
+// Обработчик для кнопки перезапуска
+restartButton.addEventListener('click', () => {
+    initGame(); // Перезапуск игры
+    gameLoop(); // Запуск игрового цикла
+});
 
+// Инициализация игры при загрузке страницы
+initGame();
 gameLoop();
