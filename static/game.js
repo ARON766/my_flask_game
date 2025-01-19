@@ -10,12 +10,14 @@ const player = {
     width: 50,
     height: 40,
     color: 'blue',
-    speed: 5
+    speed: 5,
+    lives: 10 // Добавляем жизни игрока
 };
 
 const bullets = [];
 const enemies = [];
 let score = 0;
+let gameOver = false; // Флаг для завершения игры
 
 function drawPlayer() {
     ctx.fillStyle = player.color;
@@ -42,7 +44,22 @@ function drawScore() {
     ctx.fillText(`Score: ${score}`, 10, 30);
 }
 
+function drawLives() {
+    ctx.fillStyle = 'white';
+    ctx.font = '24px Arial';
+    ctx.fillText(`Lives: ${player.lives}`, WIDTH - 150, 30);
+}
+
+function drawGameOver() {
+    ctx.fillStyle = 'white';
+    ctx.font = '48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over!', WIDTH / 2, HEIGHT / 2);
+}
+
 function update() {
+    if (gameOver) return; // Останавливаем обновление, если игра завершена
+
     // Обновление позиции пуль
     bullets.forEach(bullet => {
         bullet.y -= 10;
@@ -57,7 +74,7 @@ function update() {
         }
     });
 
-    // Проверка столкновений
+    // Проверка столкновений пуль с врагами
     bullets.forEach((bullet, bulletIndex) => {
         enemies.forEach((enemy, enemyIndex) => {
             if (bullet.x < enemy.x + 40 &&
@@ -71,6 +88,22 @@ function update() {
             }
         });
     });
+
+    // Проверка столкновений игрока с врагами
+    enemies.forEach(enemy => {
+        if (player.x < enemy.x + 40 &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + 30 &&
+            player.y + player.height > enemy.y) {
+            player.lives -= 1; // Уменьшаем жизни
+            if (player.lives <= 0) {
+                gameOver = true; // Завершаем игру, если жизни закончились
+            }
+            // Перемещаем врага за пределы экрана после столкновения
+            enemy.y = -30;
+            enemy.x = Math.random() * (WIDTH - 40);
+        }
+    });
 }
 
 function draw() {
@@ -79,15 +112,24 @@ function draw() {
     drawBullets();
     drawEnemies();
     drawScore();
+    drawLives();
+
+    if (gameOver) {
+        drawGameOver();
+    }
 }
 
 function gameLoop() {
     update();
     draw();
-    requestAnimationFrame(gameLoop);
+    if (!gameOver) {
+        requestAnimationFrame(gameLoop);
+    }
 }
 
 document.addEventListener('keydown', (e) => {
+    if (gameOver) return; // Игнорируем ввод, если игра завершена
+
     if (e.key === 'ArrowLeft' && player.x > 0) {
         player.x -= player.speed;
     }
