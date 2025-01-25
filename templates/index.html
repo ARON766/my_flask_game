@@ -11,10 +11,25 @@
             background-color: black;
         }
         #restartButton {
-            display: none; /* Скрываем кнопку по умолчанию */
+            display: none;
             margin: 20px auto;
             padding: 10px 20px;
             font-size: 18px;
+            cursor: pointer;
+        }
+        #controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .control-button {
+            padding: 15px;
+            font-size: 18px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
     </style>
@@ -22,6 +37,5 @@
 <body>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     <button id="restartButton">Restart Game</button>
-    <script src="{{ url_for('static', filename='game.js') }}"></script>
-</body>
-</html>
+    <div id="controls">
+        <

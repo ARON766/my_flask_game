@@ -2,6 +2,13 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const restartButton = document.getElementById('restartButton');
 
+// Получаем кнопки управления
+const leftButton = document.getElementById('leftButton');
+const rightButton = document.getElementById('rightButton');
+const upButton = document.getElementById('upButton');
+const downButton = document.getElementById('downButton');
+const shootButton = document.getElementById('shootButton');
+
 const WIDTH = 800;
 const HEIGHT = 600;
 
@@ -17,9 +24,9 @@ function initGame() {
         y: HEIGHT - 50,
         width: 50,
         height: 40,
-        color: 'green',
-        speed: 50,
-        lives: 10 // Начальное количество жизней
+        color: 'blue',
+        speed: 5,
+        lives: 3
     };
 
     bullets = [];
@@ -27,21 +34,20 @@ function initGame() {
     score = 0;
     gameOver = false;
 
-    // Создание врагов
     for (let i = 0; i < 8; i++) {
         spawnEnemy();
     }
 
-    restartButton.style.display = 'none'; // Скрываем кнопку при старте игры
+    restartButton.style.display = 'none';
 }
 
 function spawnEnemy() {
-    const type = Math.random() < 0.1 ? 'life' : 'normal'; // 10% шанс появления врага с жизнью
+    const type = Math.random() < 0.1 ? 'life' : 'normal';
     const enemy = {
         x: Math.random() * (WIDTH - 40),
         y: Math.random() * -200,
-        type: type, // Тип врага: 'normal' или 'life'
-        color: type === 'life' ? 'yellow' : 'red' // Цвет врага
+        type: type,
+        color: type === 'life' ? 'yellow' : 'red'
     };
     enemies.push(enemy);
 }
@@ -82,18 +88,16 @@ function drawGameOver() {
     ctx.font = '48px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('Game Over!', WIDTH / 2, HEIGHT / 2);
-    restartButton.style.display = 'block'; // Показываем кнопку
+    restartButton.style.display = 'block';
 }
 
 function update() {
     if (gameOver) return;
 
-    // Обновление позиции пуль
     bullets.forEach(bullet => {
         bullet.y -= 10;
     });
 
-    // Обновление позиции врагов
     enemies.forEach(enemy => {
         enemy.y += 3;
         if (enemy.y > HEIGHT) {
@@ -102,7 +106,6 @@ function update() {
         }
     });
 
-    // Проверка столкновений пуль с врагами
     bullets.forEach((bullet, bulletIndex) => {
         enemies.forEach((enemy, enemyIndex) => {
             if (bullet.x < enemy.x + 40 &&
@@ -112,21 +115,20 @@ function update() {
                 bullets.splice(bulletIndex, 1);
                 enemies.splice(enemyIndex, 1);
                 score += 10;
-                spawnEnemy(); // Создаем нового врага вместо удаленного
+                spawnEnemy();
             }
         });
     });
 
-    // Проверка столкновений игрока с врагами
     enemies.forEach(enemy => {
         if (player.x < enemy.x + 40 &&
             player.x + player.width > enemy.x &&
             player.y < enemy.y + 30 &&
             player.y + player.height > enemy.y) {
             if (enemy.type === 'life') {
-                player.lives += 1; // Добавляем жизнь
+                player.lives += 1;
             } else {
-                player.lives -= 1; // Отнимаем жизнь
+                player.lives -= 1;
             }
             if (player.lives <= 0) {
                 gameOver = true;
@@ -158,31 +160,39 @@ function gameLoop() {
     }
 }
 
-// Обработчик событий для управления игроком
-document.addEventListener('keydown', (e) => {
-    if (gameOver) return;
-
-    if (e.key === 'ArrowLeft' && player.x > 0) {
+// Обработчики для кнопок управления
+leftButton.addEventListener('touchstart', () => {
+    if (player.x > 0) {
         player.x -= player.speed;
     }
-    if (e.key === 'ArrowRight' && player.x < WIDTH - player.width) {
+});
+
+rightButton.addEventListener('touchstart', () => {
+    if (player.x < WIDTH - player.width) {
         player.x += player.speed;
     }
-    if (e.key === 'ArrowUp' && player.y > 0) {
+});
+
+upButton.addEventListener('touchstart', () => {
+    if (player.y > 0) {
         player.y -= player.speed;
     }
-    if (e.key === 'ArrowDown' && player.y < HEIGHT - player.height) {
+});
+
+downButton.addEventListener('touchstart', () => {
+    if (player.y < HEIGHT - player.height) {
         player.y += player.speed;
     }
-    if (e.key === ' ') {
-        bullets.push({ x: player.x + player.width / 2 - 2.5, y: player.y });
-    }
+});
+
+shootButton.addEventListener('touchstart', () => {
+    bullets.push({ x: player.x + player.width / 2 - 2.5, y: player.y });
 });
 
 // Обработчик для кнопки перезапуска
 restartButton.addEventListener('click', () => {
-    initGame(); // Перезапуск игры
-    gameLoop(); // Запуск игрового цикла
+    initGame();
+    gameLoop();
 });
 
 // Инициализация игры при загрузке страницы
