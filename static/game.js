@@ -190,6 +190,7 @@ shootButton.addEventListener('touchstart', () => {
 });
 
 // Обработчик для кнопки перезапуска
+
 restartButton.addEventListener('click', () => {
     initGame();
     gameLoop();
